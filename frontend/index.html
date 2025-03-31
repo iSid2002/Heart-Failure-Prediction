@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Heart Disease Prediction</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 5px;
+            display: none;
+        }
+        .high-risk {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+        }
+        .low-risk {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .feature-info {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center mb-4">Heart Disease Risk Prediction</h1>
+        
+        <div class="container mt-5">
+            <form id="predictionForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="age" class="form-label">Age (years)</label>
+                            <input type="number" class="form-control" id="age" name="age" required min="0" max="150">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="sex">Gender</label>
+                            <select class="form-control" id="sex" required>
+                                <option value="1">Male</option>
+                                <option value="0">Female</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="cp">Chest Pain Type</label>
+                            <select class="form-control" id="cp" required>
+                                <option value="0">Typical Angina</option>
+                                <option value="1">Atypical Angina</option>
+                                <option value="2">Non-anginal Pain</option>
+                                <option value="3">Asymptomatic</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="trestbps">Resting Blood Pressure</label>
+                            <input type="number" class="form-control" id="trestbps" required min="94" max="200">
+                            <div class="feature-info">In mm Hg (94-200)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="chol">Serum Cholesterol</label>
+                            <input type="number" class="form-control" id="chol" required min="126" max="564">
+                            <div class="feature-info">In mg/dl (126-564)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="fbs">Fasting Blood Sugar > 120 mg/dl</label>
+                            <select class="form-control" id="fbs" required>
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="restecg">Resting ECG Results</label>
+                            <select class="form-control" id="restecg" required>
+                                <option value="0">Normal</option>
+                                <option value="1">ST-T Wave Abnormality</option>
+                                <option value="2">Left Ventricular Hypertrophy</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="thalach">Maximum Heart Rate</label>
+                            <input type="number" class="form-control" id="thalach" required min="71" max="202">
+                            <div class="feature-info">Achieved during exercise (71-202)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="exang">Exercise Induced Angina</label>
+                            <select class="form-control" id="exang" required>
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="oldpeak">ST Depression</label>
+                            <input type="number" class="form-control" id="oldpeak" required min="0" max="6.2" step="0.1">
+                            <div class="feature-info">Induced by exercise relative to rest (0-6.2)</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="slope">Slope of Peak Exercise ST Segment</label>
+                            <select class="form-control" id="slope" required>
+                                <option value="0">Upsloping</option>
+                                <option value="1">Flat</option>
+                                <option value="2">Downsloping</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="ca">Number of Major Vessels</label>
+                            <select class="form-control" id="ca" required>
+                                <option value="0">0</option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                            </select>
+                            <div class="feature-info">Colored by flourosopy</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="thal">Thalassemia</label>
+                            <select class="form-control" id="thal" required>
+                                <option value="0">Normal</option>
+                                <option value="1">Fixed Defect</option>
+                                <option value="2">Reversible Defect</option>
+                                <option value="3">Unknown</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary btn-lg">Predict Risk</button>
+                    <button type="button" class="btn btn-secondary btn-lg" onclick="resetForm()">Reset Form</button>
+                </div>
+            </form>
+
+            <div class="loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p>Processing...</p>
+            </div>
+
+            <div id="result" class="result-container">
+                <h3 class="text-center mb-3">Prediction Result</h3>
+                <p id="resultMessage" class="text-center h4 mb-3"></p>
+                <p id="probability" class="text-center h5 mb-4"></p>
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <canvas id="predictionChart" height="200"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
