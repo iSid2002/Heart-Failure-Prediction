@@ -3,6 +3,8 @@ from flask_cors import CORS
 from model.heart_model import HeartFailureModel
 import os
 import traceback
+import sys
+import json
 
 app = Flask(__name__)
 
@@ -36,20 +38,28 @@ def predict():
             return jsonify({'error': 'No data provided'}), 400
             
         # Log incoming data for debugging
-        print("Received data:", data)
+        print("Received data:", json.dumps(data, indent=2), file=sys.stderr)
             
         prediction = model.predict(data)
         
         # Log prediction for debugging
-        print("Prediction result:", prediction)
+        print("Prediction result:", json.dumps(prediction, indent=2), file=sys.stderr)
         
         return jsonify(prediction)
+    except ValueError as ve:
+        error_msg = str(ve)
+        print(f"Validation error: {error_msg}", file=sys.stderr)
+        return jsonify({
+            'error': 'Validation error',
+            'message': error_msg
+        }), 400
     except Exception as e:
         error_msg = f"Error during prediction: {str(e)}\n{traceback.format_exc()}"
-        print(error_msg)  # This will show in Vercel logs
+        print(error_msg, file=sys.stderr)
         return jsonify({
             'error': 'Internal server error',
-            'message': str(e)
+            'message': str(e),
+            'traceback': traceback.format_exc()
         }), 500
 
 # For local development
