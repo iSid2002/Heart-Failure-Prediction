@@ -1,7 +1,7 @@
 // API endpoints
 const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:5001/api'
-    : 'https://heart-k16rjilop-siddhant-s-projects-193d84f3.vercel.app/api';
+    ? 'http://localhost:5001'
+    : 'https://heart-failure-prediction-backend.onrender.com';
 
 // Chart instance
 let predictionChart = null;
@@ -56,23 +56,20 @@ function getFormData() {
 // Handle form submission
 async function handleFormSubmit(event) {
     event.preventDefault();
-    console.log('Form submitted');
     
     try {
         // Show loading spinner
         document.querySelector('.loading').style.display = 'block';
         document.getElementById('result').style.display = 'none';
         
-        // Get form data
         const formData = getFormData();
-        console.log('Form data:', formData);
+        console.log('Sending form data:', formData);
         
-        // Make prediction request
-        console.log('Making API request to:', `${API_BASE_URL}/predict`);
-        const response = await fetch(`${API_BASE_URL}/predict`, {
+        const response = await fetch(`${API_BASE_URL}/api/predict`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
             body: JSON.stringify(formData)
         });
@@ -84,7 +81,14 @@ async function handleFormSubmit(event) {
             throw new Error(`Prediction request failed with status: ${response.status}, message: ${responseText}`);
         }
         
-        const result = JSON.parse(responseText);
+        let result;
+        try {
+            result = JSON.parse(responseText);
+        } catch (e) {
+            console.error('Failed to parse response:', e);
+            throw new Error('Invalid response format from server');
+        }
+        
         console.log('Prediction result:', result);
         
         // Hide loading spinner
@@ -101,12 +105,19 @@ async function handleFormSubmit(event) {
         
         // Update visualization
         updateChart(result.probability || 0);
+
+        // Add print button
+        const printButton = document.createElement('button');
+        printButton.className = 'btn btn-primary mt-3';
+        printButton.textContent = 'Print Report';
+        printButton.onclick = () => printReport(formData, result);
+        resultContainer.appendChild(printButton);
         
     } catch (error) {
         console.error('Error details:', error);
         document.querySelector('.loading').style.display = 'none';
         document.getElementById('result').style.display = 'none';
-        alert('An error occurred while making the prediction. Please check the console for details and try again.');
+        alert(error.message || 'An error occurred while making the prediction. Please try again.');
     }
 }
 
