@@ -5,7 +5,15 @@ import os
 import traceback
 
 app = Flask(__name__)
-CORS(app, resources={r"/api/*": {"origins": "*"}})
+
+# Configure CORS
+CORS(app, resources={
+    r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # Initialize the model
 model = HeartFailureModel()
@@ -14,8 +22,11 @@ model = HeartFailureModel()
 def healthcheck():
     return jsonify({"status": "healthy"})
 
-@app.route('/api/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST', 'OPTIONS'])
 def predict():
+    if request.method == 'OPTIONS':
+        return '', 204
+        
     try:
         if not request.is_json:
             return jsonify({'error': 'Request must be JSON'}), 400
