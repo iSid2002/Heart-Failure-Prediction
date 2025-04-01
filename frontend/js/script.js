@@ -1,7 +1,7 @@
 // API endpoints
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:5001'
-    : 'https://heart-failure-prediction-app.herokuapp.com';
+    : 'https://heartfailureprediction.pythonanywhere.com';
 
 // Chart instance
 let predictionChart = null;
