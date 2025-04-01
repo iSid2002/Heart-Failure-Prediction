@@ -9,13 +9,7 @@ import json
 app = Flask(__name__)
 
 # Configure CORS
-CORS(app, resources={
-    r"/api/*": {
-        "origins": "*",
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type"]
-    }
-})
+CORS(app)
 
 # Initialize the model
 model = HeartFailureModel()
@@ -30,8 +24,15 @@ def predict():
         return '', 204
         
     try:
+        # Log request details
+        print("Request headers:", dict(request.headers), file=sys.stderr)
+        print("Request data:", request.get_data(as_text=True), file=sys.stderr)
+        
         if not request.is_json:
-            return jsonify({'error': 'Request must be JSON'}), 400
+            return jsonify({
+                'error': 'Request must be JSON',
+                'content_type': request.content_type
+            }), 400
             
         data = request.get_json()
         if not data:

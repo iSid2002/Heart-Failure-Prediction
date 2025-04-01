@@ -1,7 +1,7 @@
 // API endpoints
 const API_BASE_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:5001/api'
-    : '/api';
+    : 'https://heart-k16rjilop-siddhant-s-projects-193d84f3.vercel.app/api';
 
 // Chart instance
 let predictionChart = null;
@@ -23,14 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
 function getFormData() {
     try {
         const formData = {
-            age: parseInt(document.getElementById('age').value),
+            age: parseFloat(document.getElementById('age').value),
             sex: parseInt(document.getElementById('sex').value),
             cp: parseInt(document.getElementById('cp').value),
-            trestbps: parseInt(document.getElementById('trestbps').value),
-            chol: parseInt(document.getElementById('chol').value),
+            trestbps: parseFloat(document.getElementById('trestbps').value),
+            chol: parseFloat(document.getElementById('chol').value),
             fbs: parseInt(document.getElementById('fbs').value),
             restecg: parseInt(document.getElementById('restecg').value),
-            thalach: parseInt(document.getElementById('thalach').value),
+            thalach: parseFloat(document.getElementById('thalach').value),
             exang: parseInt(document.getElementById('exang').value),
             oldpeak: parseFloat(document.getElementById('oldpeak').value),
             slope: parseInt(document.getElementById('slope').value),
@@ -72,20 +72,19 @@ async function handleFormSubmit(event) {
         const response = await fetch(`${API_BASE_URL}/predict`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
+                'Content-Type': 'application/json'
             },
-            mode: 'cors',
-            credentials: 'same-origin',
             body: JSON.stringify(formData)
         });
         
+        const responseText = await response.text();
+        console.log('Raw response:', responseText);
+        
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Prediction request failed with status: ${response.status}, message: ${errorText}`);
+            throw new Error(`Prediction request failed with status: ${response.status}, message: ${responseText}`);
         }
         
-        const result = await response.json();
+        const result = JSON.parse(responseText);
         console.log('Prediction result:', result);
         
         // Hide loading spinner
@@ -102,19 +101,12 @@ async function handleFormSubmit(event) {
         
         // Update visualization
         updateChart(result.probability || 0);
-
-        // Add print button
-        const printButton = document.createElement('button');
-        printButton.className = 'btn btn-primary mt-3';
-        printButton.textContent = 'Print Report';
-        printButton.onclick = () => printReport(formData, result);
-        resultContainer.appendChild(printButton);
         
     } catch (error) {
         console.error('Error details:', error);
         document.querySelector('.loading').style.display = 'none';
         document.getElementById('result').style.display = 'none';
-        alert(error.message || 'An error occurred while making the prediction. Please try again.');
+        alert('An error occurred while making the prediction. Please check the console for details and try again.');
     }
 }
 
