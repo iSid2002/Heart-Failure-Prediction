@@ -14,7 +14,8 @@ class HeartFailureModel:
         # Required fields
         self.required_fields = [
             'age', 'sex', 'cp', 'trestbps', 'chol', 'fbs',
-            'thalach', 'exang', 'oldpeak'
+            'restecg', 'thalach', 'exang', 'oldpeak', 'slope',
+            'ca', 'thal'
         ]
         
     def validate_input(self, data):
