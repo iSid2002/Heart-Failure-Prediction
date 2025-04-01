@@ -1,9 +1,9 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from model.heart_model import HeartFailureModel
 import os
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../frontend')
 
 # Configure CORS
 CORS(app)
@@ -13,7 +13,7 @@ model = HeartFailureModel()
 
 @app.route('/')
 def home():
-    return jsonify({"status": "ok", "message": "Heart Failure Prediction API is running"})
+    return send_from_directory(app.static_folder, 'index.html')
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
